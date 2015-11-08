@@ -230,13 +230,9 @@ void font (ofstream& o, const string COLOR, const string FACE, const string SIZE
 	o << ">" << endl;
 }
 
-string analyze_text (const string S) {
+string analyze_bold_text (const string S) {
 
 	string OUT;
-
-	cout << S << endl;
-
-	const string BOLD = "*";
 
 	vector <string> row;
 
@@ -246,13 +242,35 @@ string analyze_text (const string S) {
 
 	while (getline (iss, cell, '*')) row.push_back (cell);
 
+	if (row.size() == 1) return S;
+
 	for (size_t i = 0; i < row.size(); i++) {
 
 		if (EVEN (i)) OUT = OUT + row.at(i) + "<b>";
 		else OUT = OUT + row.at(i) + "</b>";
 	}
-	cout << OUT << endl;
+	return OUT;
+}
 
+string analyze_italic_text (const string S) {
+
+	string OUT;
+
+	vector <string> row;
+
+	istringstream iss (S);
+
+	string cell;
+
+	while (getline (iss, cell, '~')) row.push_back (cell);
+
+	if (row.size() == 1) return S;
+
+	for (size_t i = 0; i < row.size(); i++) {
+
+		if (EVEN (i)) OUT = OUT + row.at(i) + "<i>";
+		else OUT = OUT + row.at(i) + "</i>";
+	}
 	return OUT;
 }
 
@@ -266,12 +284,14 @@ void text_close (ofstream& o) {
 	o << "</p> " << endl;
 }
 
+/*
 void text (ofstream& o, const string TEXT) {
 
 	o << "<p> " << flush;
 	o << analyze_text (TEXT) << " " << flush;
 	o << "/<p> " << endl;;
 }
+*/
 
 void list_open (ofstream& o) {
 
@@ -1127,6 +1147,12 @@ void generate_main_table_content_no_frame (ofstream& o, const string MODE) {
 
 void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN) {
 
+	if (S.size() == 0) {
+
+		linebreak (o);
+		return;
+	}
+
 	string TEXT = S;
 
 	string FT = FONT;
@@ -1148,7 +1174,6 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 	if (PROCESS_AS_LIST) {
 
 		style_margin_left (o, "10%");
-		//style_text_color (o, return_ELEMENT_properties_element_font_color ());
 		style_list_style_type (o, return_ELEMENT_properties_element_list_bullet ());
 	}
 	style_font_family (o, FT);
@@ -1159,17 +1184,10 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
 
-	//if (PROCESS_AS_LIST) {
+	TEXT = analyze_bold_text (TEXT);
+	TEXT = analyze_italic_text (TEXT);
 
-	//	span_open(o);
-	//	style_open (o);
-	//	style_text_color (o, return_BLACK());
-	//	tag_end (o);
-	//}
-
-	o << analyze_text (TEXT) << endl;
-
-	//if (PROCESS_AS_LIST) span_close (o);
+	o << TEXT << endl;
 
 	if (PROCESS_AS_LIST) list_close (o);
 	else text_close (o);
@@ -1177,7 +1195,15 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 void contact_details (ofstream& o) {
 
-	write (o, "- Email address: *DorothysArtCreations@gmail.com*", "Verdana", "14", "center");
+	write (o, "Email address: *DorothysArtCreations@gmail.com*", "Verdana", "14", "center");
+}
+
+void feedbacks (ofstream& o) {
+
+	write (o, "", "Verdana", "14", "left");
+	write (o, "- This person said:  *Absolutely fantastic!*", "Verdana", "14", "left");
+	write (o, "- Second person said:  ~Absolutely fantastic!~", "Verdana", "14", "center");
+	write (o, "- Third person said:  ~*Absolutely fantastic!*~", "Verdana", "14", "right");
 }
 
 void generate_page_main_table (ofstream& o, const string FN, const string MODE, const vector <ITEM>& IT, const size_t this_item) {
@@ -1190,15 +1216,23 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 	const bool CC = MODE == "CATEGORY_CONTENT";
 	const bool PC = MODE == "PRODUCTS_CONTENT";
 	const bool CT = MODE == "CONTACT";
+	const bool EV = MODE == "MY_EVENTS";
+	const bool FB = MODE == "FEEDBACK";
 
-	if (I || C || P || E || CT) {
+	if (I || C || P || E || CT || EV || FB) {
 
 		table_open (o, "center");
 		main_table_style (o, MODE);
+
 		cell_open (o);
+		style_open(o);
+		if (CT) style_vertical_align(o, "middle");
+		if (FB) style_vertical_align(o, "top");
+		style_close(o);
 		tag_end (o);
 
-		if (FN == "CONTACT") contact_details (o);
+		if (CT) contact_details (o);
+		if (FB) feedbacks (o);
 	}
 
 	if (I || IC || CC || PC || E) {
@@ -1211,7 +1245,7 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 		generate_categories_element_table (o, MODE, FN, L);
 	}
 
-	if (I || C || P || E || CT) {
+	if (I || C || P || E || CT || EV || FB) {
 
 		if (P || C) generate_main_table_content_with_frame (o, FN, MODE);
 
