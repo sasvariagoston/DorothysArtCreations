@@ -286,3 +286,8 @@ string return_CONTACT_text_vertical_align() {
 
 	return "middle";
 }
+
+string return_LIST_HEAD () {
+
+	return "&#9632";
+}

@@ -5,7 +5,14 @@
 #ifndef UTILS_HPP_
 #define UTILS_HPP_
 
+#include "settings.hpp"
+
 bool EVEN (const size_t i);
+
+bool by_TITLE (const LINKS& x, const LINKS& y);
+bool by_rev_TITLE (const LINKS& x, const LINKS& y);
+bool by_AGE (const ITEM& x, const ITEM& y);
+bool by_rev_AGE (const ITEM& x, const ITEM& y);
 
 string uppercase (const string S);
 string lowercase (const string S);

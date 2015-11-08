@@ -140,4 +140,6 @@ string return_CONTACT_font_weight();
 string return_CONTACT_text_align();
 string return_CONTACT_text_vertical_align();
 
+string return_LIST_HEAD ();
+
 #endif /* SETTINGS_HPP_ */

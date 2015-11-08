@@ -136,8 +136,6 @@ void style_opacity (ofstream& o, const string OP) {
 	o << "opacity: " << OP << ";" << flush;
 }
 
-//----------------------------------------STYLE END
-
 void tag_end (ofstream& o) {
 
 	o << " >" << endl;
@@ -163,9 +161,11 @@ void head_close (ofstream& o) {
 	o << "</head>" << endl;
 }
 
-void title (ofstream& o, const string TITLE) {
+void title (ofstream& o, const string TITLE, const vector <ITEM>& IT, const size_t this_item) {
 
-	o << "  <title> " << TITLE << " </title>" << endl;
+	const string TTL = TITLE + " - " + IT.at (this_item).ITEM_NAME.at(0);
+
+	o << "  <title> " << TTL << " </title>" << endl;
 }
 
 void body_open (ofstream& o) {
@@ -221,15 +221,6 @@ void image_open (ofstream& o, const string SRC) {
 	o << "<img src = " 			<< T << SRC << T << " " << flush;
 }
 
-void font (ofstream& o, const string COLOR, const string FACE, const string SIZE) {
-
-	o << "<font " << flush;
-	o << "color = " 	<< T << COLOR << T << " " << flush;
-	o << "face = " 		<< T << FACE << T << " " << flush;
-	o << "size = " 		<< T << SIZE << T << " " << flush;
-	o << ">" << endl;
-}
-
 string analyze_bold_text (const string S) {
 
 	string OUT;
@@ -282,25 +273,6 @@ void text_open (ofstream& o) {
 void text_close (ofstream& o) {
 
 	o << "</p> " << endl;
-}
-
-/*
-void text (ofstream& o, const string TEXT) {
-
-	o << "<p> " << flush;
-	o << analyze_text (TEXT) << " " << flush;
-	o << "/<p> " << endl;;
-}
-*/
-
-void list_open (ofstream& o) {
-
-	o << "<li " << flush;
-}
-
-void list_close (ofstream& o) {
-
-	o << "</li> " << endl;
 }
 
 void linebreak (ofstream& o) {
@@ -510,9 +482,9 @@ void generate_html_head (ofstream& o, const string MODE, const vector <ITEM>& IT
 	html_open (o);
 	head_open (o);
 
-	title (o, T);
-
-	if (this_item < 999) tags (o, IT, this_item);
+	//title (o, T);
+	if (this_item < 999) title (o, T, IT, this_item);
+	//if (this_item < 999) tags (o, IT, this_item);
 
 	icon (o, MODE);
 
@@ -632,26 +604,6 @@ void generate_header_and_links (ofstream& o, const string FN, const string MODE,
 		cell_close(o);
 	}
 	table_close(o);
-}
-
-bool by_TITLE (const LINKS& x, const LINKS& y) {
-
-	return x.TITLE < y.TITLE;
-}
-
-bool by_rev_TITLE (const LINKS& x, const LINKS& y) {
-
-	return x.TITLE > y.TITLE;
-}
-
-bool by_AGE (const ITEM& x, const ITEM& y) {
-
-	return x.NUMBER < y.NUMBER;
-}
-
-bool by_rev_AGE (const ITEM& x, const ITEM& y) {
-
-	return x.NUMBER > y.NUMBER;
 }
 
 vector <LINKS> convert_items_to_links (const vector <ITEM>& IT, const string MODE) {
@@ -951,18 +903,30 @@ void list_properties_style (ofstream& o) {
 	tag_end(o);
 }
 
-void list_properties_element_style (ofstream& o) {
+void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN) {
+
+	const string HEAD = return_LIST_HEAD ();
+
+	text_open (o);
 
 	style_open (o);
 	style_margin_left (o, "10%");
-	style_font_family (o, return_ELEMENT_properties_element_font_family ());
 	style_text_color (o, return_ELEMENT_properties_element_font_color ());
-	style_list_style_type (o, return_ELEMENT_properties_element_list_bullet ());
-	style_font_size (o, return_ELEMENT_properties_element_font_size ());
-	style_font_weight (o, return_ELEMENT_properties_element_font_weight ());
-	style_text_align (o, return_ELEMENT_properties_element_text_align ());
+	style_text_align (o, ALIGN);
 	style_close (o);
 	tag_end(o);
+	o << HEAD << " " << endl;
+	span_open(o);
+
+	style_open (o);
+	style_text_color (o, return_ELEMENT_properties_font_color ());
+	style_font_family (o, FONT);
+	style_font_size (o, SIZE);
+	style_close (o);
+	tag_end(o);
+	o << S << " " << endl;
+	span_close(o);
+	text_close(o);
 }
 
 void list_elements_vector (ofstream& o, const string PROPERTY, const vector <string>& CONTENT) {
@@ -974,10 +938,11 @@ void list_elements_vector (ofstream& o, const string PROPERTY, const vector <str
 
 	for (size_t i = 0; i < CONTENT.size(); i++) {
 
-		list_open(o);
-		list_properties_element_style (o);
-		o << CONTENT.at(i) << endl;
-		list_close (o);
+		const string FONT = return_ELEMENT_properties_element_font_family ();
+		const string SIZE = return_ELEMENT_properties_element_font_size ();
+		const string ALIGN = return_ELEMENT_properties_element_text_align ();
+
+		write (o, "- " + CONTENT.at(i), FONT, SIZE, ALIGN);
 	}
 	linebreak(o);
 }
@@ -1001,11 +966,14 @@ void list_elements_bool (ofstream& o, const string ELEMENT, const bool STATUS) {
 	o << ELEMENT << endl;
 	text_close (o);
 
-	list_open(o);
-	list_properties_element_style (o);
-	if (STATUS) o << "Yes" << endl;
-	else o << "No" << endl;
-	list_close (o);
+	const string FONT = return_ELEMENT_properties_element_font_family ();
+	const string SIZE = return_ELEMENT_properties_element_font_size ();
+	const string ALIGN = return_ELEMENT_properties_element_text_align ();
+
+	string S = "No";
+	if (STATUS) S = "Yes";
+
+	write (o, "- *" + S, FONT, SIZE, ALIGN);
 
 	linebreak(o);
 }
@@ -1166,16 +1134,8 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 	const bool PROCESS_AS_LIST = (S.size() > 2 && S.at(0) == '-' && S.at(1) == ' ');
 
-	if (PROCESS_AS_LIST) list_open(o);
-	else text_open (o);
-
+	text_open (o);
 	style_open (o);
-
-	if (PROCESS_AS_LIST) {
-
-		style_margin_left (o, "10%");
-		style_list_style_type (o, return_ELEMENT_properties_element_list_bullet ());
-	}
 	style_font_family (o, FT);
 	style_font_size (o, SZ);
 	style_text_align (o, AL);
@@ -1187,10 +1147,10 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 	TEXT = analyze_bold_text (TEXT);
 	TEXT = analyze_italic_text (TEXT);
 
-	o << TEXT << endl;
+	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN);
+	else o << TEXT << endl;
 
-	if (PROCESS_AS_LIST) list_close (o);
-	else text_close (o);
+	text_close (o);
 }
 
 void contact_details (ofstream& o) {

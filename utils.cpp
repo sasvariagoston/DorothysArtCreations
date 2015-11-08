@@ -10,12 +10,34 @@
 #include <sstream>
 #include <vector>
 
+#include "utils.hpp"
+
 using namespace std;
 
 bool EVEN (const size_t i) {
 
 	if (i % 2 == 0) return true;
 	return false;
+}
+
+bool by_TITLE (const LINKS& x, const LINKS& y) {
+
+	return x.TITLE < y.TITLE;
+}
+
+bool by_rev_TITLE (const LINKS& x, const LINKS& y) {
+
+	return x.TITLE > y.TITLE;
+}
+
+bool by_AGE (const ITEM& x, const ITEM& y) {
+
+	return x.NUMBER < y.NUMBER;
+}
+
+bool by_rev_AGE (const ITEM& x, const ITEM& y) {
+
+	return x.NUMBER > y.NUMBER;
 }
 
 string uppercase (const string S) {
