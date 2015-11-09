@@ -261,7 +261,7 @@ string analyze_text (const string S, const string MODE) {
 
 	for (size_t i = 0; i < row.size(); i++) {
 
-		const bool FORMAT = (i < row.size() - 1 && !EVEN (i));
+		const bool FORMAT = (i < row.size() && !EVEN (i));
 
 		if (FORMAT) OUT = OUT + OPEN + row.at(i) + CLOSE;
 		else OUT = OUT + row.at(i);
@@ -589,13 +589,18 @@ void generate_header_and_links (ofstream& o, const string FN, const string MODE,
 	if (E) PATH = "../";
 
 	table_open (o, "center");
-		format_header_jpg (o);
-		cell_open (o);
-		tag_end(o);
+	format_header_jpg (o);
+	cell_open (o);
+	tag_end(o);
 
-		image_open(o, PATH + "bg2.jpg");
-		cell_close(o);
-		table_close(o);
+	image_open(o, PATH + "bg2.jpg");
+
+	style_height (o, "100%");
+	style_width (o, "100%");
+	tag_end(o);
+
+	cell_close(o);
+	table_close(o);
 
 
 	table_open (o, "center");
@@ -1235,6 +1240,20 @@ void feedbacks (ofstream& o) {
 	//write (o, "- Third person said:  ~*Absolutely fantastic!*~", "Verdana", "14", "right");
 }
 
+void events (ofstream& o) {
+
+	vector <string> E = read_text_file ("events.txt");
+
+	if (E.size() == 0) return;
+
+	write (o, "", "Verdana", "14", "left", "150%");
+
+	for (size_t i = 0; i < E.size(); i++) {
+
+		write (o, E.at(i), "Verdana", "14", "justify", "150%");
+	}
+}
+
 void generate_page_main_table (ofstream& o, const string FN, const string MODE, const vector <ITEM>& IT, const size_t this_item) {
 
 	const bool I =  MODE == "INDEX";
@@ -1256,7 +1275,7 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 		cell_open (o);
 		style_open(o);
 		if (CT) style_vertical_align(o, "middle");
-		if (FB) style_vertical_align(o, "top");
+		if (FB || EV) style_vertical_align(o, "top");
 
 		//style_line_height (o, return_ROW_HEIGHT());
 
@@ -1265,6 +1284,7 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 
 		if (CT) contact_details (o);
 		if (FB) feedbacks (o);
+		if (EV) events (o);
 	}
 
 	if (I || IC || CC || PC || E) {
