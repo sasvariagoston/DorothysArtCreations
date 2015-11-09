@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "DAC.hpp"
+#include "data_io.hpp"
 #include "html.hpp"
 #include "settings.hpp"
 #include "utils.hpp"
@@ -108,6 +109,17 @@ void style_list_style_type (ofstream& o, const string STYLE) {
 void style_margin_left (ofstream& o, const string MARGIN) {
 
 	o << "margin-left: " << MARGIN << ";" << flush;
+}
+
+void style_margin_right (ofstream& o, const string MARGIN) {
+
+	o << "margin-right: " << MARGIN << ";" << flush;
+}
+
+
+void style_line_height (ofstream& o, const string HEIGHT) {
+
+	o << "line-height: " << HEIGHT << ";" << flush;
 }
 
 void style_text_color (ofstream& o, const string COLOR) {
@@ -221,7 +233,21 @@ void image_open (ofstream& o, const string SRC) {
 	o << "<img src = " 			<< T << SRC << T << " " << flush;
 }
 
-string analyze_bold_text (const string S) {
+string analyze_text (const string S, const string MODE) {
+
+	const bool BLD = MODE == "BOLD";
+	const bool ITL = MODE == "ITALIC";
+
+	if (!BLD && !ITL) return S;
+
+	char SEP = '*';
+	if (ITL) SEP = '~';
+
+	string OPEN = "<b>";
+	if (ITL) OPEN = "<i>";
+
+	string CLOSE = "</b>";
+	if (ITL) CLOSE = "</i>";
 
 	string OUT;
 
@@ -229,20 +255,21 @@ string analyze_bold_text (const string S) {
 
 	istringstream iss (S);
 
-	string cell;
+	string buf;
 
-	while (getline (iss, cell, '*')) row.push_back (cell);
-
-	if (row.size() == 1) return S;
+	while (getline (iss, buf, SEP)) row.push_back (buf);
 
 	for (size_t i = 0; i < row.size(); i++) {
 
-		if (EVEN (i)) OUT = OUT + row.at(i) + "<b>";
-		else OUT = OUT + row.at(i) + "</b>";
+		const bool FORMAT = (i < row.size() - 1 && !EVEN (i));
+
+		if (FORMAT) OUT = OUT + OPEN + row.at(i) + CLOSE;
+		else OUT = OUT + row.at(i);
 	}
 	return OUT;
 }
 
+/*
 string analyze_italic_text (const string S) {
 
 	string OUT;
@@ -251,20 +278,27 @@ string analyze_italic_text (const string S) {
 
 	istringstream iss (S);
 
-	string cell;
+	string buf;
 
-	while (getline (iss, cell, '~')) row.push_back (cell);
+	while (getline (iss, buf, '~')) row.push_back (buf);
 
-	if (row.size() == 1) return S;
+	//if (row.size() == 1) return S;
 
 	for (size_t i = 0; i < row.size(); i++) {
 
-		if (EVEN (i)) OUT = OUT + row.at(i) + "<i>";
-		else OUT = OUT + row.at(i) + "</i>";
+		//cout << "OUT: " << OUT << endl;
+
+		OUT = OUT + row.at(i);
+
+		if (i < row.size() - 1) {
+
+			if (EVEN (i)) OUT = OUT + "<i>";
+			else OUT = OUT + "</i>";
+		}
 	}
 	return OUT;
 }
-
+*/
 void text_open (ofstream& o) {
 
 	o << "<p " << flush;
@@ -893,7 +927,8 @@ void generate_categories_element_table (ofstream& o, const string MODE, const st
 void list_properties_style (ofstream& o) {
 
 	style_open (o);
-	style_margin_left (o, "10%");
+	style_margin_left (o, "20px");
+	style_line_height (o, return_ROW_HEIGHT());
 	style_font_family (o, return_ELEMENT_properties_font_family ());
 	style_text_color (o, return_ELEMENT_properties_font_color ());
 	style_font_size (o, return_ELEMENT_properties_font_size ());
@@ -903,14 +938,16 @@ void list_properties_style (ofstream& o) {
 	tag_end(o);
 }
 
-void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN) {
+void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
 
 	const string HEAD = return_LIST_HEAD ();
 
 	text_open (o);
 
 	style_open (o);
-	style_margin_left (o, "10%");
+	style_margin_left (o, "20px");
+	style_margin_right (o, "10px");
+	style_line_height (o, LH);
 	style_text_color (o, return_ELEMENT_properties_element_font_color ());
 	style_text_align (o, ALIGN);
 	style_close (o);
@@ -919,6 +956,7 @@ void list_string (ofstream& o, const string S, const string FONT, const string S
 	span_open(o);
 
 	style_open (o);
+	style_line_height (o, LH);
 	style_text_color (o, return_ELEMENT_properties_font_color ());
 	style_font_family (o, FONT);
 	style_font_size (o, SIZE);
@@ -941,15 +979,17 @@ void list_elements_vector (ofstream& o, const string PROPERTY, const vector <str
 		const string FONT = return_ELEMENT_properties_element_font_family ();
 		const string SIZE = return_ELEMENT_properties_element_font_size ();
 		const string ALIGN = return_ELEMENT_properties_element_text_align ();
+		const string LINEHEIGHT = return_ROW_HEIGHT();
 
-		write (o, "- " + CONTENT.at(i), FONT, SIZE, ALIGN);
+		write (o, "- " + CONTENT.at(i), FONT, SIZE, ALIGN, LINEHEIGHT);
 	}
-	linebreak(o);
+	//linebreak(o);
 }
 
 void element_properties_style (ofstream& o) {
 
 	style_open (o);
+	style_line_height (o, return_ROW_HEIGHT());
 	style_font_family (o, return_ELEMENT_properties_title_font_family ());
 	style_text_color (o, return_ELEMENT_properties_title_font_color());
 	style_font_size (o, return_ELEMENT_properties_title_font_size ());
@@ -969,13 +1009,14 @@ void list_elements_bool (ofstream& o, const string ELEMENT, const bool STATUS) {
 	const string FONT = return_ELEMENT_properties_element_font_family ();
 	const string SIZE = return_ELEMENT_properties_element_font_size ();
 	const string ALIGN = return_ELEMENT_properties_element_text_align ();
+	const string LINEHEIGHT = return_ROW_HEIGHT();
 
 	string S = "No";
 	if (STATUS) S = "Yes";
 
-	write (o, "- *" + S, FONT, SIZE, ALIGN);
+	write (o, "- " + S, FONT, SIZE, ALIGN, LINEHEIGHT);
 
-	linebreak(o);
+	//linebreak(o);
 }
 
 void list_element_properties (ofstream& o, const ITEM& IT) {
@@ -1113,7 +1154,25 @@ void generate_main_table_content_no_frame (ofstream& o, const string MODE) {
 	tag_end (o);
 }
 
-void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN) {
+//style_line_height (o, return_ROW_HEIGHT());
+
+void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH) {
+
+	text_open (o);
+	style_open (o);
+	style_margin_left (o, "10px");
+	style_margin_right (o, "10px");
+	style_font_family (o, FONT);
+	style_font_size (o, SIZE);
+	style_text_align (o, ALIGN);
+	style_line_height (o, LH);
+	style_close (o);
+	tag_end(o);
+	o << TEXT << endl;
+	text_close (o);
+}
+
+void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
 
 	if (S.size() == 0) {
 
@@ -1134,36 +1193,46 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 	const bool PROCESS_AS_LIST = (S.size() > 2 && S.at(0) == '-' && S.at(1) == ' ');
 
-	text_open (o);
-	style_open (o);
-	style_font_family (o, FT);
-	style_font_size (o, SZ);
-	style_text_align (o, AL);
-	style_close (o);
-	tag_end(o);
 
 	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
 
-	TEXT = analyze_bold_text (TEXT);
-	TEXT = analyze_italic_text (TEXT);
+	TEXT = analyze_text (TEXT, "BOLD");
+	TEXT = analyze_text (TEXT, "ITALIC");
 
-	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN);
-	else o << TEXT << endl;
-
-	text_close (o);
+	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN, LH);
+	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH);
 }
 
 void contact_details (ofstream& o) {
 
-	write (o, "Email address: *DorothysArtCreations@gmail.com*", "Verdana", "14", "center");
+	vector <string> C = read_text_file ("contact.txt");
+
+	if (C.size() == 0) return;
+
+	for (size_t i = 0; i < C.size(); i++) {
+
+		write (o, C.at(i), "Verdana", "14", "center", "150%");
+	}
 }
 
 void feedbacks (ofstream& o) {
 
-	write (o, "", "Verdana", "14", "left");
-	write (o, "- This person said:  *Absolutely fantastic!*", "Verdana", "14", "left");
-	write (o, "- Second person said:  ~Absolutely fantastic!~", "Verdana", "14", "center");
-	write (o, "- Third person said:  ~*Absolutely fantastic!*~", "Verdana", "14", "right");
+	vector <string> F = read_text_file ("feedbacks.txt");
+
+	if (F.size() == 0) return;
+
+	write (o, "", "Verdana", "14", "left", "150%");
+
+	for (size_t i = 0; i < F.size(); i++) {
+
+		write (o, F.at(i), "Verdana", "14", "justify", "150%");
+	}
+
+
+	//write (o, "", "Verdana", "14", "left");
+	//write (o, "- This person said:  *Absolutely fantastic!*", "Verdana", "14", "left");
+	//write (o, "- Second person said:  ~Absolutely fantastic!~", "Verdana", "14", "center");
+	//write (o, "- Third person said:  ~*Absolutely fantastic!*~", "Verdana", "14", "right");
 }
 
 void generate_page_main_table (ofstream& o, const string FN, const string MODE, const vector <ITEM>& IT, const size_t this_item) {
@@ -1188,6 +1257,9 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 		style_open(o);
 		if (CT) style_vertical_align(o, "middle");
 		if (FB) style_vertical_align(o, "top");
+
+		//style_line_height (o, return_ROW_HEIGHT());
+
 		style_close(o);
 		tag_end (o);
 

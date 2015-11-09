@@ -87,6 +87,23 @@ void line_to_table (const string& line, const size_t row_counter) {
 	TABLE.push_back (row);
 }
 
+vector <string> read_text_file (const string FN) {
+
+	vector <string> OUT;
+
+	ifstream F;
+	F.open (FN.c_str());
+
+	string buf;
+
+	while (getline (F, buf)) OUT.push_back (buf);
+
+	if (OUT.size() == 0) cout << "!    File '" << FN << "' is empty." << endl;
+	else cout << "    File '" << FN << "' read." << endl;
+
+	return OUT;
+}
+
 bool read_MASTER_FILE () {
 
 	ifstream MF;

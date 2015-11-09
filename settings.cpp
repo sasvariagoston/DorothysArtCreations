@@ -291,3 +291,8 @@ string return_LIST_HEAD () {
 
 	return "&#9632";
 }
+
+string return_ROW_HEIGHT () {
+
+	return "130%";
+}

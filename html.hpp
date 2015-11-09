@@ -32,7 +32,9 @@ void style_font_weight (ofstream& o, const string WEIGHT);
 void style_list_style_type (ofstream& o, const string STYLE);
 
 void style_margin_left (ofstream& o, const string MARGIN);
+void style_margin_right (ofstream& o, const string MARGIN);
 
+void style_line_height (ofstream& o, const string HEIGHT);
 void style_text_color (ofstream& o, const string COLOR);
 void style_text_align (ofstream& o, const string ALIGN);
 
@@ -66,8 +68,10 @@ void cell_close (ofstream& o);
 
 void image_open (ofstream& o, const string SRC);
 
-string analyze_bold_text (const string S);
-string analyze_italic_text (const string S);
+string analyze_text (const string S, const string MODE);
+
+//string analyze_bold_text (const string S);
+//string analyze_italic_text (const string S);
 
 void text_open (ofstream& o);
 void text_close (ofstream& o);
@@ -134,7 +138,7 @@ void link_of_item (ofstream& o, const string MODE, const vector <LINKS>& M, cons
 void generate_categories_element_table (ofstream& o, const string MODE, const string FN, const vector <LINKS>& TO_DUMP);
 
 void list_properties_style (ofstream& o);
-void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN);
+void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
 void list_elements_vector (ofstream& o, const string PROPERTY, const vector <string>& CONTENT);
 
 void element_properties_style (ofstream& o) ;
@@ -152,7 +156,8 @@ string generate_frame_border_width (const string MODE);
 void generate_main_table_content_with_frame (ofstream& o, const string FN, const string MODE);
 void generate_main_table_content_no_frame (ofstream& o, const string MODE);
 
-void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN);
+void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH);
+void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
 
 void contact_details (ofstream& o) ;
 void feedbacks (ofstream& o);

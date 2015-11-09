@@ -142,4 +142,6 @@ string return_CONTACT_text_vertical_align();
 
 string return_LIST_HEAD ();
 
+string return_ROW_HEIGHT();
+
 #endif /* SETTINGS_HPP_ */
