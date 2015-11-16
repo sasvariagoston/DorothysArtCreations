@@ -913,7 +913,7 @@ void contact_details (ofstream& o) {
 
 void feedbacks (ofstream& o) {
 
-	vector <string> F = read_text_file ("feedbacks.txt");
+	vector <string> F = read_text_file ("feedback.txt");
 
 	if (F.size() == 0) return;
 
@@ -937,6 +937,14 @@ void events (ofstream& o) {
 
 		write (o, E.at(i), "Verdana", "14", "justify", "150%");
 	}
+
+	linebreak(o);
+	image_open (o, "2015_11_wenue_cymru_1.jpg");
+	tag_end(o);
+	linebreak(o);
+	linebreak(o);
+	image_open (o, "2015_11_wenue_cymru_2.jpg");
+	tag_end(o);
 }
 
 void about (ofstream& o) {
@@ -1020,7 +1028,6 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 			tag_end(o);
 			cell_close(o);
 		}
-
 
 		if (I  || E) {
 
