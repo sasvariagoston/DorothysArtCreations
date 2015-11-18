@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Ã�goston SasvÃ¡ri
+// Copyright (C) 2015 �goston Sasv�ri
 // All rights reserved.
 // This code is published under the GNU Lesser General Public License.
 
@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "css_html_formatting.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -45,6 +46,11 @@ void style_background_position (ofstream& o, const string POS) {
 void style_background_size (ofstream& o, const string POS) {
 
 	o << "background-size: " << POS << ";" << flush;
+}
+
+void style_background_attachment (ofstream& o, const string ATT) {
+
+	o << "background-attachment: " << ATT << ";" << flush;
 }
 
 void style_background_repeat (ofstream& o, const string REP) {
@@ -112,7 +118,15 @@ void style_margin_right (ofstream& o, const string MARGIN) {
 	o << "margin-right: " << MARGIN << ";" << flush;
 }
 
+void style_margin_top (ofstream& o, const string MARGIN) {
 
+	o << "margin-top: " << MARGIN << ";" << flush;
+}
+
+void style_margin_bottom (ofstream& o, const string MARGIN) {
+
+	o << "margin-bottom: " << MARGIN << ";" << flush;
+}
 void style_line_height (ofstream& o, const string HEIGHT) {
 
 	o << "line-height: " << HEIGHT << ";" << flush;
@@ -126,6 +140,11 @@ void style_text_color (ofstream& o, const string COLOR) {
 void style_text_align (ofstream& o, const string ALIGN) {
 
 	o << "text-align: " << ALIGN << ";" << flush;
+}
+
+void style_text_decoration (ofstream& o, const string DEC) {
+
+	o << "text-decoration: " << DEC << ";" << flush;
 }
 
 void style_vertical_align (ofstream& o, const string ALIGN) {
@@ -178,6 +197,21 @@ void title (ofstream& o, const string TITLE, const string NAME) {
 	if (NAME.size() > 0) TTL = TTL + " - " + NAME;
 
 	o << "  <title> " << TTL << " </title>" << endl;
+}
+
+//void tags (ofstream&o, const vector <ITEM>& IT, const size_t this_item) {
+//
+//	const string T = generate_tag (IT.at(this_item));
+//
+//	meta_open (o, T);
+//	tag_end(o);
+//}
+
+void icon (ofstream& o, const string ICONNAME) {
+
+	o << "<link rel = " << T << " shortcut icon " << T << flush;
+	o << " type = " << T << " image/x-icon " << T << flush;
+	o << " href = " << T << ICONNAME << T << ">" << flush;
 }
 
 void body_open (ofstream& o) {
@@ -298,4 +332,116 @@ void iframe_close (ofstream& o) {
 void meta_open (ofstream& o, const string M) {
 
 	o << "<meta name=" << T <<"Keywords" << T <<" content= "<< T << M << T << endl;
+}
+
+string analyze_text (const string S, const string MODE) {
+
+	const bool BLD = MODE == "BOLD";
+	const bool ITL = MODE == "ITALIC";
+
+	if (!BLD && !ITL) return S;
+
+	char SEP = '*';
+	if (ITL) SEP = '~';
+
+	string OPEN = "<b>";
+	if (ITL) OPEN = "<i>";
+
+	string CLOSE = "</b>";
+	if (ITL) CLOSE = "</i>";
+
+	string OUT;
+
+	vector <string> row;
+
+	istringstream iss (S);
+
+	string buf;
+
+	while (getline (iss, buf, SEP)) row.push_back (buf);
+
+	for (size_t i = 0; i < row.size(); i++) {
+
+		const bool FORMAT = (i < row.size() && !EVEN (i));
+
+		if (FORMAT) OUT = OUT + OPEN + row.at(i) + CLOSE;
+		else OUT = OUT + row.at(i);
+	}
+	return OUT;
+}
+
+void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH) {
+
+	text_open (o);
+	style_open (o);
+	style_margin_left (o, "10px");
+	style_margin_right (o, "10px");
+	style_font_family (o, FONT);
+	style_font_size (o, SIZE);
+	style_text_align (o, ALIGN);
+	style_line_height (o, LH);
+	style_close (o);
+	tag_end(o);
+	o << TEXT << endl;
+	text_close (o);
+}
+
+void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
+
+	const string HEAD = return_LIST_HEAD ();
+
+	text_open (o);
+
+	style_open (o);
+	style_margin_left (o, "20px");
+	style_margin_right (o, "10px");
+	style_line_height (o, LH);
+	style_text_color (o, return_ELEMENT_properties_element_font_color ());
+	style_text_align (o, ALIGN);
+	style_close (o);
+	tag_end(o);
+	o << HEAD << " " << endl;
+	span_open(o);
+
+	style_open (o);
+	style_line_height (o, LH);
+	style_text_color (o, return_ELEMENT_properties_font_color ());
+	style_font_family (o, FONT);
+	style_font_size (o, SIZE);
+	style_close (o);
+	tag_end(o);
+	o << S << " " << endl;
+	span_close(o);
+	text_close(o);
+}
+
+void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
+
+	if (S.size() == 0) {
+
+		linebreak (o);
+		return;
+	}
+
+	string TEXT = S;
+
+	string FT = FONT;
+	if (FONT == "") FT = "inherit";
+
+	string SZ = SIZE;
+	if (SIZE == "") SZ = "inherit";
+
+	string AL = ALIGN;
+	if (ALIGN == "") AL = "inherit";
+
+	const bool PROCESS_AS_LIST = (S.size() > 2 && S.at(0) == '-' && S.at(1) == ' ');
+
+
+	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
+
+	TEXT = analyze_text (TEXT, "BOLD");
+	TEXT = analyze_text (TEXT, "ITALIC");
+
+	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN, LH);
+	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH);
 }

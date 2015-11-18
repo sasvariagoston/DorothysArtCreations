@@ -7,6 +7,8 @@
 
 #include "settings.hpp"
 
+vector <string> read_text_file (const string FN);
+
 bool EVEN (const size_t i);
 
 bool by_TITLE (const LINKS& x, const LINKS& y);

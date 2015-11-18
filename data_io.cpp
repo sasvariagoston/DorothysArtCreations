@@ -87,6 +87,7 @@ void line_to_table (const string& line, const size_t row_counter) {
 	TABLE.push_back (row);
 }
 
+/*
 vector <string> read_text_file (const string FN) {
 
 	vector <string> OUT;
@@ -103,6 +104,7 @@ vector <string> read_text_file (const string FN) {
 
 	return OUT;
 }
+*/
 
 bool read_MASTER_FILE () {
 

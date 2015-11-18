@@ -1,4 +1,4 @@
-// Copyright (C) 2015 �goston Sasv�ri
+// Copyright (C) 2015 Ágoston Sasvári
 // All rights reserved.
 // This code is published under the GNU Lesser General Public License.
 
@@ -10,7 +10,7 @@
 
 #include "css_html_formatting.hpp"
 
-string analyze_text (const string S, const string MODE);
+//string analyze_text (const string S, const string MODE);
 
 vector <size_t> set_categories_vector (const size_t P1, const size_t P2, const size_t P3, const size_t P4);
 vector <size_t> set_cells_geometry_3_element (const size_t N) ;
@@ -22,8 +22,8 @@ void tracking_code (ofstream& o);
 
 string generate_tag (const ITEM& IT);
 
-void tags (ofstream&o, const vector <ITEM>& IT, const size_t this_item);
-void icon (ofstream& o, const string MODE);
+//void tags (ofstream&o, const vector <ITEM>& IT, const size_t this_item);
+//void icon (ofstream& o, const string MODE);
 
 void generate_html_head (ofstream& o, const string MODE, const vector <ITEM>& IT, const size_t this_item) ;
 
@@ -60,7 +60,7 @@ void link_of_item (ofstream& o, const string MODE, const vector <LINKS>& M, cons
 void generate_categories_element_table (ofstream& o, const string MODE, const string FN, const vector <LINKS>& TO_DUMP);
 
 void list_properties_style (ofstream& o);
-void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
+//void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
 void list_elements_vector (ofstream& o, const string PROPERTY, const vector <string>& CONTENT);
 
 void element_properties_style (ofstream& o) ;
@@ -78,8 +78,8 @@ string generate_frame_border_width (const string MODE);
 void generate_main_table_content_with_frame (ofstream& o, const string FN, const string MODE);
 void generate_main_table_content_no_frame (ofstream& o, const string MODE);
 
-void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH);
-void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
+//void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH);
+//void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
 
 void contact_details (ofstream& o) ;
 void feedbacks (ofstream& o);

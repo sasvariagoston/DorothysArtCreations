@@ -6,6 +6,7 @@
 #define CSS_HTML_FORMATTING_HPP_
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ void style_background_color (ofstream& o, const string COLOR);
 void style_background_image (ofstream& o, const string IMAGE);
 void style_background_position (ofstream& o, const string POS);
 void style_background_size (ofstream& o, const string POS);
+void style_background_attachment (ofstream& o, const string ATT);
 void style_background_repeat (ofstream& o, const string REP);
 
 void style_border_color (ofstream& o, const string COLOR);
@@ -34,10 +36,13 @@ void style_list_style_type (ofstream& o, const string STYLE);
 
 void style_margin_left (ofstream& o, const string MARGIN);
 void style_margin_right (ofstream& o, const string MARGIN);
+void style_margin_top (ofstream& o, const string MARGIN);
+void style_margin_bottom (ofstream& o, const string MARGIN);
 
 void style_line_height (ofstream& o, const string HEIGHT);
 void style_text_color (ofstream& o, const string COLOR);
 void style_text_align (ofstream& o, const string ALIGN);
+void style_text_decoration (ofstream& o, const string DEC);
 
 void style_vertical_align (ofstream& o, const string ALIGN);
 
@@ -54,6 +59,8 @@ void head_open (ofstream& o);
 void head_close (ofstream& o);
 
 void title (ofstream& o, const string TITLE, const string NAME);
+//void tags (ofstream&o, const vector <ITEM>& IT, const size_t this_item);
+void icon (ofstream& o, const string ICONNAME);
 
 void body_open (ofstream& o);
 void body_close (ofstream& o);
@@ -85,5 +92,10 @@ void link_end (ofstream& o);
 void iframe_open (ofstream& o, const string SRC, const string HEIGHT, const string WIDTH);
 void iframe_close (ofstream& o);
 void meta_open (ofstream& o, const string M);
+
+string analyze_text (const string S, const string MODE);
+void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH);
+void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
+void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
 
 #endif /* CSS_HTML_FORMATTING_HPP_ */

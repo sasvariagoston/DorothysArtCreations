@@ -16,7 +16,7 @@ bool return_MASTER_FILE_NAME (const vector <string>& ARG_V);//ok
 
 vector <string> split_cell_content (const string s);//ok
 void line_to_table (const string& line, const size_t row_counter);//ok
-vector <string> read_text_file (const string FN);
+//vector <string> read_text_file (const string FN);
 bool read_MASTER_FILE ();//ok
 
 void define_allowed_cell_data_number ();//ok

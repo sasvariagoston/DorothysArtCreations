@@ -3,7 +3,7 @@
 // This code is published under the GNU Lesser General Public License.
 
 #include <algorithm>
-//#include <fstream>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -13,6 +13,23 @@
 #include "utils.hpp"
 
 using namespace std;
+
+vector <string> read_text_file (const string FN) {
+
+	vector <string> OUT;
+
+	ifstream F;
+	F.open (FN.c_str());
+
+	string buf;
+
+	while (getline (F, buf)) OUT.push_back (buf);
+
+	if (OUT.size() == 0) cout << "!    File '" << FN << "' is empty." << endl;
+	else cout << "    File '" << FN << "' read." << endl;
+
+	return OUT;
+}
 
 bool EVEN (const size_t i) {
 

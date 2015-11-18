@@ -21,42 +21,6 @@ const char T = '"';
 
 }
 
-string analyze_text (const string S, const string MODE) {
-
-	const bool BLD = MODE == "BOLD";
-	const bool ITL = MODE == "ITALIC";
-
-	if (!BLD && !ITL) return S;
-
-	char SEP = '*';
-	if (ITL) SEP = '~';
-
-	string OPEN = "<b>";
-	if (ITL) OPEN = "<i>";
-
-	string CLOSE = "</b>";
-	if (ITL) CLOSE = "</i>";
-
-	string OUT;
-
-	vector <string> row;
-
-	istringstream iss (S);
-
-	string buf;
-
-	while (getline (iss, buf, SEP)) row.push_back (buf);
-
-	for (size_t i = 0; i < row.size(); i++) {
-
-		const bool FORMAT = (i < row.size() && !EVEN (i));
-
-		if (FORMAT) OUT = OUT + OPEN + row.at(i) + CLOSE;
-		else OUT = OUT + row.at(i);
-	}
-	return OUT;
-}
-
 vector <size_t> set_categories_vector (const size_t P1, const size_t P2, const size_t P3, const size_t P4) {
 
 	vector <size_t> GEOMETRY;
@@ -180,27 +144,11 @@ string generate_tag (const ITEM& IT) {
 	return OUT;
 }
 
-void tags (ofstream&o, const vector <ITEM>& IT, const size_t this_item) {
 
-	const string T = generate_tag (IT.at(this_item));
-
-	meta_open (o, T);
-	tag_end(o);
-}
-
-void icon (ofstream& o, const string MODE) {
-
-	const bool E = MODE == "ELEMENT";
-
-	string PATH = "";
-	if (E) PATH = "../";
-
-	o << "<link rel = " << T << " shortcut icon " << T << flush;
-	o << " type = " << T << " image/x-icon " << T << flush;
-	o << " href = " << T << PATH << "icon.ico" << T << ">" << flush;
-}
 
 void generate_html_head (ofstream& o, const string MODE, const vector <ITEM>& IT, const size_t this_item) {
+
+	const bool E =  MODE == "ELEMENT";
 
 	const string T = return_HTML_HEAD_TITLE();
 
@@ -211,7 +159,12 @@ void generate_html_head (ofstream& o, const string MODE, const vector <ITEM>& IT
 	if (this_item < 999) title (o, T, IT.at(this_item).ITEM_NAME.at(0));
 	//if (this_item < 999) tags (o, IT, this_item);
 
-	icon (o, MODE);
+	string PATH = "";
+	if (E) PATH = "../";
+
+	const string ICONNAME = PATH + "icon.ico";
+
+	icon (o, ICONNAME);
 
 	tracking_code (o);
 	head_close (o);
@@ -634,34 +587,6 @@ void list_properties_style (ofstream& o) {
 	tag_end(o);
 }
 
-void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
-
-	const string HEAD = return_LIST_HEAD ();
-
-	text_open (o);
-
-	style_open (o);
-	style_margin_left (o, "20px");
-	style_margin_right (o, "10px");
-	style_line_height (o, LH);
-	style_text_color (o, return_ELEMENT_properties_element_font_color ());
-	style_text_align (o, ALIGN);
-	style_close (o);
-	tag_end(o);
-	o << HEAD << " " << endl;
-	span_open(o);
-
-	style_open (o);
-	style_line_height (o, LH);
-	style_text_color (o, return_ELEMENT_properties_font_color ());
-	style_font_family (o, FONT);
-	style_font_size (o, SIZE);
-	style_close (o);
-	tag_end(o);
-	o << S << " " << endl;
-	span_close(o);
-	text_close(o);
-}
 
 void list_elements_vector (ofstream& o, const string PROPERTY, const vector <string>& CONTENT) {
 
@@ -851,53 +776,6 @@ void generate_main_table_content_no_frame (ofstream& o, const string MODE) {
 }
 
 //style_line_height (o, return_ROW_HEIGHT());
-
-void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH) {
-
-	text_open (o);
-	style_open (o);
-	style_margin_left (o, "10px");
-	style_margin_right (o, "10px");
-	style_font_family (o, FONT);
-	style_font_size (o, SIZE);
-	style_text_align (o, ALIGN);
-	style_line_height (o, LH);
-	style_close (o);
-	tag_end(o);
-	o << TEXT << endl;
-	text_close (o);
-}
-
-void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
-
-	if (S.size() == 0) {
-
-		linebreak (o);
-		return;
-	}
-
-	string TEXT = S;
-
-	string FT = FONT;
-	if (FONT == "") FT = "inherit";
-
-	string SZ = SIZE;
-	if (SIZE == "") SZ = "inherit";
-
-	string AL = ALIGN;
-	if (ALIGN == "") AL = "inherit";
-
-	const bool PROCESS_AS_LIST = (S.size() > 2 && S.at(0) == '-' && S.at(1) == ' ');
-
-
-	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
-
-	TEXT = analyze_text (TEXT, "BOLD");
-	TEXT = analyze_text (TEXT, "ITALIC");
-
-	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN, LH);
-	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH);
-}
 
 void contact_details (ofstream& o) {
 
