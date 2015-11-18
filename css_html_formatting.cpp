@@ -1,6 +1,7 @@
-// Copyright (C) 2015 �goston Sasv�ri
+// Copyright (C) 2015 Ágoston Sasvári
 // All rights reserved.
 // This code is published under the GNU Lesser General Public License.
+
 
 #include <algorithm>
 #include <fstream>
@@ -188,24 +189,14 @@ void head_close (ofstream& o) {
 	o << "</head>" << endl;
 }
 
-//void title (ofstream& o, const string TITLE, const vector <ITEM>& IT, const size_t this_item) {
 void title (ofstream& o, const string TITLE, const string NAME) {
 
-	//const string TTL = TITLE + " - " + IT.at (this_item).ITEM_NAME.at(0);
 	string TTL = TITLE;
 
 	if (NAME.size() > 0) TTL = TTL + " - " + NAME;
 
 	o << "  <title> " << TTL << " </title>" << endl;
 }
-
-//void tags (ofstream&o, const vector <ITEM>& IT, const size_t this_item) {
-//
-//	const string T = generate_tag (IT.at(this_item));
-//
-//	meta_open (o, T);
-//	tag_end(o);
-//}
 
 void icon (ofstream& o, const string ICONNAME) {
 
@@ -264,7 +255,7 @@ void cell_close (ofstream& o) {
 
 void image_open (ofstream& o, const string SRC) {
 
-	o << "<img src = " 			<< T << SRC << T << " " << flush;
+	o << "<img src = " << T << SRC << T << " " << flush;
 }
 
 void text_open (ofstream& o) {
@@ -336,19 +327,46 @@ void meta_open (ofstream& o, const string M) {
 
 string analyze_text (const string S, const string MODE) {
 
+	/*
+
+	 ~ TEXT ~         -> italic
+	 * TEXT *         -> bold
+	 # TEXT #         -> insert image
+	 { LINK {} TEXT } -> TEXT, pointing to LINK
+
+	 */
+
+	const bool HR1 = MODE == "HREF1";
+	const bool HR2 = MODE == "HREF2";
+
 	const bool BLD = MODE == "BOLD";
 	const bool ITL = MODE == "ITALIC";
+	const bool IMG = MODE == "IMAGE";
 
 	if (!BLD && !ITL) return S;
 
 	char SEP = '*';
 	if (ITL) SEP = '~';
+	if (IMG) SEP = '#';
+	if (HR1) SEP = '{';
+	if (HR2) SEP = '}';
 
 	string OPEN = "<b>";
 	if (ITL) OPEN = "<i>";
+	if (IMG) OPEN = "<img src = " + T;
+	if (HR1) OPEN = T + "r";
+
+	stringstream ss;
+
+	ss << "<a style = " << T << " text-decoration: underline; " << T << "target = " << T << "_blank" << T << " href = " << T;
+
+	if (HR2) OPEN = ss.str();
 
 	string CLOSE = "</b>";
 	if (ITL) CLOSE = "</i>";
+	if (IMG) CLOSE = T + ">";
+	if (HR1) CLOSE = T + ">";
+	if (HR1) CLOSE = "</a>";
 
 	string OUT;
 
@@ -439,8 +457,12 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
 
+	TEXT = analyze_text (TEXT, "HREF1");
+	TEXT = analyze_text (TEXT, "HREF2");
+
 	TEXT = analyze_text (TEXT, "BOLD");
 	TEXT = analyze_text (TEXT, "ITALIC");
+	TEXT = analyze_text (TEXT, "IMAGE");
 
 	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN, LH);
 	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH);
