@@ -816,13 +816,13 @@ void events (ofstream& o) {
 		write (o, E.at(i), "Verdana", "14", "justify", "150%");
 	}
 
-	linebreak(o);
-	image_open (o, "2015_11_wenue_cymru_1.jpg");
-	tag_end(o);
-	linebreak(o);
-	linebreak(o);
-	image_open (o, "2015_11_wenue_cymru_2.jpg");
-	tag_end(o);
+	//linebreak(o);
+	//image_open (o, "2015_11_wenue_cymru_1.jpg");
+	//tag_end(o);
+	//linebreak(o);
+	//linebreak(o);
+	//image_open (o, "2015_11_wenue_cymru_2.jpg");
+	//tag_end(o);
 }
 
 void about (ofstream& o) {

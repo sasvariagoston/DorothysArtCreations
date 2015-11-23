@@ -338,35 +338,56 @@ string analyze_text (const string S, const string MODE) {
 
 	const bool HR1 = MODE == "HREF1";
 	const bool HR2 = MODE == "HREF2";
-
 	const bool BLD = MODE == "BOLD";
 	const bool ITL = MODE == "ITALIC";
 	const bool IMG = MODE == "IMAGE";
 
-	if (!BLD && !ITL) return S;
+	if (!BLD && !ITL && !IMG && !HR1 && !HR2) return S;
 
-	char SEP = '*';
+	char SEP;
+	if (BLD) SEP = '*';
 	if (ITL) SEP = '~';
 	if (IMG) SEP = '#';
 	if (HR1) SEP = '{';
 	if (HR2) SEP = '}';
 
-	string OPEN = "<b>";
-	if (ITL) OPEN = "<i>";
-	if (IMG) OPEN = "<img src = " + T;
-	if (HR1) OPEN = T + "r";
+	stringstream oss;
+	if (BLD) oss << "<b>" << flush;
+	if (ITL) oss << "<i>" << flush;
+	if (IMG) oss << "<img src = " << T << flush;
+	if (HR1) oss << "<a style = " << T << " color:rgb(255, 255, 255); text-decoration: underline; " << T << "target = " << T << "_blank" << T << " href = " << T << flush;
+	if (HR2) oss << "" << flush;
 
-	stringstream ss;
+	const string OPEN = oss.str();
 
-	ss << "<a style = " << T << " text-decoration: underline; " << T << "target = " << T << "_blank" << T << " href = " << T;
+	/*
 
-	if (HR2) OPEN = ss.str();
+	<a style = " color:rgb(255, 255, 255);font-family: Verdana;font-size: 14;font-weight: bold;text-decoration: none; "target = "_self" href =
 
-	string CLOSE = "</b>";
-	if (ITL) CLOSE = "</i>";
-	if (IMG) CLOSE = T + ">";
-	if (HR1) CLOSE = T + ">";
-	if (HR1) CLOSE = "</a>";
+	"pictures.htm"
+
+	>
+
+	[  PICTURES  ]
+
+	</a> </td>
+	 */
+
+
+
+	stringstream css;
+	if (BLD) css << "</b>" << flush;
+	if (ITL) css << "</i>" << flush;
+	if (IMG) css << T << ">" << flush;
+	if (HR1) css << T << ">" << flush;
+	if (HR2) css << "</a>" << flush;
+	const string CLOSE = css.str();
+
+	//cout << "MODE:  " << MODE << endl;
+	//cout << "OPEN:  " << OPEN << endl;
+	//cout << "CLOSE: " << CLOSE << endl;
+	//cout << "SEP:   " << SEP. << endl;
+	//cout << BLD << ITL << IMG << HR1 << HR2 << endl;
 
 	string OUT;
 
@@ -454,15 +475,13 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 	const bool PROCESS_AS_LIST = (S.size() > 2 && S.at(0) == '-' && S.at(1) == ' ');
 
-
 	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
 
-	TEXT = analyze_text (TEXT, "HREF1");
-	TEXT = analyze_text (TEXT, "HREF2");
-
+	TEXT = analyze_text (TEXT, "IMAGE");
 	TEXT = analyze_text (TEXT, "BOLD");
 	TEXT = analyze_text (TEXT, "ITALIC");
-	TEXT = analyze_text (TEXT, "IMAGE");
+	TEXT = analyze_text (TEXT, "HREF1");
+	TEXT = analyze_text (TEXT, "HREF2");
 
 	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN, LH);
 	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH);
