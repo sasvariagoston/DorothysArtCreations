@@ -27,6 +27,8 @@ const string SEP =";";
 
 const string NUMBERS = "0123456789";
 
+const string LINK_TITLE = "[ BUY ME HERE ]";
+
 }
 
 enum CELLS {
@@ -40,6 +42,7 @@ enum CELLS {
 	SHIPPING,
 	LINK,
 	IMAGE,
+	PAYPAL,
 	SIZE
 };
 
@@ -146,10 +149,11 @@ void define_allowed_cell_data_number () {
 	ALLOWED_CELL_DATA_NUMBER.at(PROPERTIES) = 999;
 	ALLOWED_CELL_DATA_NUMBER.at(AVAILABLE) = 1;
 	ALLOWED_CELL_DATA_NUMBER.at(ORDER) = 1;
-	ALLOWED_CELL_DATA_NUMBER.at(PRICE) = 0;
-	ALLOWED_CELL_DATA_NUMBER.at(SHIPPING) = 0;
-	ALLOWED_CELL_DATA_NUMBER.at(LINK) = 0;
+	ALLOWED_CELL_DATA_NUMBER.at(PRICE) = 999;
+	ALLOWED_CELL_DATA_NUMBER.at(SHIPPING) = 999;
+	ALLOWED_CELL_DATA_NUMBER.at(LINK) = 999;
 	ALLOWED_CELL_DATA_NUMBER.at(IMAGE) = 0;
+	ALLOWED_CELL_DATA_NUMBER.at(PAYPAL) = 999;
 }
 
 vector <string> split_cell_content (const string s) {
@@ -185,11 +189,14 @@ bool check_master_cell_data_number () {
 			const size_t S = SPLITTED_CELL.size();
 			const size_t A = ALLOWED_CELL_DATA_NUMBER.at(j);
 
-			if (S > A) {
+			const bool MORE = S > A;
+
+			if (MORE) {
 
 				cout << "!   More data (" << S << ") in row " << i+1 << ", column " << j+1 << " then expected (" << A << ")." << endl;
 				error++;
 			}
+
 			const bool LESS = ((S < A || S == 0) && A < 900 && A > 0);
 
 			if (LESS) {
@@ -372,6 +379,7 @@ vector <ITEM> convert_table_to_items () {
 		if (A.at(SHIPPING) > 0) 	buf.SHIPPING = 		split_cell_content (TABLE.at(i).at(SHIPPING));
 		if (A.at(LINK) > 0) 		buf.LINK = 			split_cell_content (TABLE.at(i).at(LINK));
 		if (A.at(IMAGE) > 0) 		buf.IMAGE = 		split_cell_content (TABLE.at(i).at(IMAGE));
+		if (A.at(PAYPAL) > 0) 		buf.PAYPAL = 		split_cell_content (TABLE.at(i).at(PAYPAL));
 
 		buf.FOLDER_NAME = generate_folder_name (buf.ITEM_NAME);
 
@@ -393,6 +401,28 @@ vector <string> tidy_item_shipping (const vector <string>& IN) {
 	return OUT;
 }
 
+vector <string> tidy_properties (const vector <string> IN, const bool HAND_PAINTED) {
+
+	vector <string> OUT = IN;
+
+	OUT.push_back("All items presented here are unique and hand made");
+
+	OUT.push_back("Because the preparation method and the used material, colour and shape of the final product may vary");
+
+	OUT.push_back("Extra care is taken to deliver as similar product comparing to the displayed one as possible");
+
+	string TXT = "The item should be dispatched within ";
+
+	if (HAND_PAINTED) TXT = TXT + "5";
+	else TXT = TXT + "3";
+
+	OUT.push_back(TXT +" working days");
+
+	OUT.push_back("If you have any question please feel free to contact me");
+
+	return OUT;
+}
+
 string tidy_item_name (const string IN) {
 
 	string OUT = IN;
@@ -408,6 +438,17 @@ string tidy_item_name (const string IN) {
 	return OUT;
 }
 
+string tidy_link (const string IN) {
+
+	if (IN.size() == 0) return IN;
+
+	stringstream ss;
+
+	ss << "{" << IN << "{}*" << LINK_TITLE << "*}" << flush;
+
+	return ss.str();
+}
+
 vector <ITEM> tidy_items () {
 
 	vector <ITEM> OUT = return_ITEMS();
@@ -418,9 +459,29 @@ vector <ITEM> tidy_items () {
 
 			OUT.at(i).ITEM_NAME.at(j) = tidy_item_name (OUT.at(i).ITEM_NAME.at(j));
 		}
+
+		bool HAND_PAINTED = false;
+
+		for (size_t j = 0; j < OUT.at(i).MAIN_CATEGORY.size(); j++) {
+
+			if (uppercase(OUT.at(i).MAIN_CATEGORY.at(j)) == "HAND-PAINTED") HAND_PAINTED = true;
+		}
+
+		for (size_t j = 0; j < OUT.at(i).SUB_CATEGORY.size(); j++) {
+
+			if (uppercase(OUT.at(i).SUB_CATEGORY.at(j)) == "HAND-PAINTED") HAND_PAINTED = true;
+		}
+
+		OUT.at(i).PROPERTIES = tidy_properties (OUT.at(i).PROPERTIES, HAND_PAINTED);
+
+		for (size_t j = 0; j < OUT.at(i).LINK.size(); j++) {
+
+			OUT.at(i).LINK.at(j) = tidy_link (OUT.at(i).LINK.at(j));
+		}
+
 		const size_t S = OUT.at(i).SHIPPING.size();
 
-		if (S > 0) OUT.at(i).SHIPPING = tidy_item_shipping (OUT.at(i).SHIPPING);
+		//if (S > 0) OUT.at(i).SHIPPING = tidy_item_shipping (OUT.at(i).SHIPPING);
 	}
 	return OUT;
 }

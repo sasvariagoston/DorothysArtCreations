@@ -31,7 +31,9 @@ vector <string> generate_folder_name (vector <string> ITEM_NAME); //ok
 vector <ITEM> convert_table_to_items ();
 
 vector <string> tidy_item_shipping (const vector <string>& IN);//ok
+string tidy_properties (const string IN, const bool HAND_PAINTED);
 string tidy_item_name (const string IN);//ok
+string tidy_link (const string IN);
 vector <ITEM> tidy_items ();
 
 vector <ITEM> extract_items_pictures_name ();

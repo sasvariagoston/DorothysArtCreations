@@ -60,7 +60,9 @@ void link_of_item (ofstream& o, const string MODE, const vector <LINKS>& M, cons
 void generate_categories_element_table (ofstream& o, const string MODE, const string FN, const vector <LINKS>& TO_DUMP);
 
 void list_properties_style (ofstream& o);
+void list_cost_style (ofstream& o);
 //void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
+void list_price (ofstream& o, const string PROPERTY, const vector <string>& CONTENT);
 void list_elements_vector (ofstream& o, const string PROPERTY, const vector <string>& CONTENT);
 
 void element_properties_style (ofstream& o) ;

@@ -44,6 +44,7 @@ struct ITEM {
 	vector <string> SHIPPING;
 	vector <string> LINK;
 	vector <string> IMAGE;
+	vector <string> PAYPAL;
 
 	//others
 	vector <string> FOLDER_NAME;
@@ -130,9 +131,14 @@ string return_ELEMENT_properties_text_align ();
 string return_ELEMENT_properties_element_font_family ();
 string return_ELEMENT_properties_element_font_color ();
 string return_ELEMENT_properties_element_font_size ();
+string return_ELEMENT_properties_element_font_size_weblink ();
 string return_ELEMENT_properties_element_font_weight ();
 string return_ELEMENT_properties_element_text_align ();
+string return_ELEMENT_properties_element_text_align_weblink ();
 string return_ELEMENT_properties_element_list_bullet ();
+
+string return_COST_properties_text_align ();
+string return_COST_properties_font_size ();
 
 string return_CONTACT_font_family();
 string return_CONTACT_font_size();
@@ -141,7 +147,9 @@ string return_CONTACT_text_align();
 string return_CONTACT_text_vertical_align();
 
 string return_LIST_HEAD ();
+string return_POUND ();
 
 string return_ROW_HEIGHT();
+string return_COST_HEIGHT ();
 
 #endif /* SETTINGS_HPP_ */

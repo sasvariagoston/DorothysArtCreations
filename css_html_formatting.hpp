@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Ágoston Sasvári
+// Copyright (C) 2015 Ã�goston SasvÃ¡ri
 // All rights reserved.
 // This code is published under the GNU Lesser General Public License.
 
@@ -21,8 +21,12 @@ void style_background_attachment (ofstream& o, const string ATT);
 void style_background_repeat (ofstream& o, const string REP);
 
 void style_border_color (ofstream& o, const string COLOR);
+void style_border_bottom_color (ofstream& o, const string COLOR);
+void style_border_collapse (ofstream& o, const string COLLAPSE);
 void style_border_style (ofstream& o, const string STYLE);
+void style_border_bottom_style (ofstream& o, const string STYLE);
 void style_border_width (ofstream& o, const string WIDTH);
+void style_border_bottom_width (ofstream& o, const string WIDTH);
 
 void style_height (ofstream& o, const string HEIGHT);
 void style_width (ofstream& o, const string WIDTH);
@@ -67,7 +71,7 @@ void body_close (ofstream& o);
 
 void charset (ofstream& o, const string CHARSET);
 
-void table_open (ofstream& o, const string ALIGN);
+void table_open (ofstream& o, const string CELLPADDING, const string CELLSPACING, const string ALIGN);
 void table_close (ofstream& o);
 void row_open (ofstream& o);
 void row_close (ofstream& o);
@@ -92,10 +96,11 @@ void link_end (ofstream& o);
 void iframe_open (ofstream& o, const string SRC, const string HEIGHT, const string WIDTH);
 void iframe_close (ofstream& o);
 void meta_open (ofstream& o, const string M);
+void list_paypal (ofstream& o, const vector <string>& CONTENT);
 
-string analyze_text (const string S, const string MODE);
-void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH);
+string analyze_text (const string S, const string MODE, const string COLOR);
+void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH, const string COLOR);
 void list_string (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
-void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH);
+void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH, const string COLOR);
 
 #endif /* CSS_HTML_FORMATTING_HPP_ */

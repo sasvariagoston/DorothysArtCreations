@@ -253,6 +253,10 @@ string return_ELEMENT_properties_element_font_size () {
 
 	return "10";
 }
+string return_ELEMENT_properties_element_font_size_weblink () {
+
+	return "12";
+}
 string return_ELEMENT_properties_element_font_weight () {
 
 	return "bold";
@@ -261,9 +265,23 @@ string return_ELEMENT_properties_element_text_align () {
 
 	return "left";
 }
+string return_ELEMENT_properties_element_text_align_weblink () {
+
+	return "center";
+}
 string return_ELEMENT_properties_element_list_bullet () {
 
 	return "square";
+}
+
+string return_COST_properties_text_align () {
+
+	return "center";
+}
+
+string return_COST_properties_font_size () {
+
+	return "14";
 }
 
 string return_CONTACT_font_family() {
@@ -292,7 +310,17 @@ string return_LIST_HEAD () {
 	return "&#9632";
 }
 
+string return_POUND () {
+
+	return "&pound";
+}
+
 string return_ROW_HEIGHT () {
 
 	return "130%";
+}
+
+string return_COST_HEIGHT () {
+
+	return "100%";
 }

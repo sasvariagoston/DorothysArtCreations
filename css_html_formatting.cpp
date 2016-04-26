@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Ágoston Sasvári
+// Copyright (C) 2015 Ã�goston SasvÃ¡ri
 // All rights reserved.
 // This code is published under the GNU Lesser General Public License.
 
@@ -59,9 +59,19 @@ void style_background_repeat (ofstream& o, const string REP) {
 	o << "background-repeat: " << REP << ";" << flush;
 }
 
+void style_border_collapse (ofstream& o, const string COLLAPSE) {
+
+	o << "border-collapse: " << COLLAPSE << ";" << flush;
+}
+
 void style_border_color (ofstream& o, const string COLOR) {
 
 	o << "border-color: rgb(" << COLOR << ");" << flush;
+}
+
+void style_border_bottom_color (ofstream& o, const string COLOR) {
+
+	o << "border-bottom-color: rgb(" << COLOR << ");" << flush;
 }
 
 void style_border_style (ofstream& o, const string STYLE) {
@@ -69,9 +79,19 @@ void style_border_style (ofstream& o, const string STYLE) {
 	o << "border-style: " << STYLE << ";" << flush;
 }
 
+void style_border_bottom_style (ofstream& o, const string STYLE) {
+
+	o << "border-bottom-style: " << STYLE << ";" << flush;
+}
+
 void style_border_width (ofstream& o, const string WIDTH) {
 
 	o << "border-width: " << WIDTH << ";" << flush;
+}
+
+void style_border_bottom_width (ofstream& o, const string WIDTH) {
+
+	o << "border-bottom-width: " << WIDTH << ";" << flush;
 }
 
 void style_height (ofstream& o, const string HEIGHT) {
@@ -220,12 +240,12 @@ void charset (ofstream& o, const string CHARSET) {
 	o << "charset = " << T << CHARSET << T << " " << endl;
 }
 
-void table_open (ofstream& o, const string ALIGN) {
+void table_open (ofstream& o, const string CELLPADDING, const string CELLSPACING, const string ALIGN) {
 
 	o << "<table " << flush;
-	o << "cellpadding = " << T << "0" << T << " " << endl;
-	o << "cellspacing = " << T << "1" << T << " " << endl;
-	o << "align = " 		<< T << ALIGN << T << " " << flush;
+	o << "cellpadding = " << T << CELLPADDING << T << " " << endl;
+	o << "cellspacing = " << T << CELLSPACING << T << " " << endl;
+	o << "align = " << T << ALIGN << T << " " << flush;
 }
 
 void table_close (ofstream& o) {
@@ -325,11 +345,30 @@ void meta_open (ofstream& o, const string M) {
 	o << "<meta name=" << T <<"Keywords" << T <<" content= "<< T << M << T << endl;
 }
 
-string analyze_text (const string S, const string MODE) {
+void list_paypal (ofstream& o, const vector <string>& CONTENT) {
+
+	o << "<div style=" << T << "width:160px;margin:0 auto;" << T << ">" << endl;
+
+	o << "<form action=" << T << "https://www.paypal.com/cgi-bin/webscr" << T << " method=" << T << "post" << T << " target=" << T << "_top" << T << ">" << endl;
+
+	o << "<input type=" << T << "hidden" << T << " name=" << T << "cmd" << T << " value=" << T << "_s-xclick" << T << ">"<< endl;
+
+	o << "<input type=" << T << "hidden" << T << " name=" << T << "hosted_button_id" << T << " value=" << T << CONTENT.at(0) << T << ">"<< endl;
+
+	o << "<input type=" << T << "image" << T << " src=" << T << "https://www.paypalobjects.com/en_US/GB/i/btn/btn_buynowCC_LG.gif" << T << " border=" << T << "0" << T << " name=" << T << "submit" << T << " alt=" << T << "PayPal - The safer, easier way to pay online." << T << ">"<< endl;
+
+	o << "<img alt=" << T  << T << " border=" << T << "0" << T << " src=" << T << "https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" << T << " width=" << T << "1" << T << " height=" << T << "1" << T << ">"<< endl;
+
+	o << "</form>"<< endl;
+
+	o << "</div>"<< endl;
+}
+
+string analyze_text (const string S, const string MODE, const string COLOR) {
 
 	/*
 
-	 ~ TEXT ~         -> italic
+	  ~ TEXT ~         -> italic
 	 * TEXT *         -> bold
 	 # TEXT #         -> insert image
 	 { LINK {} TEXT } -> TEXT, pointing to LINK
@@ -355,25 +394,29 @@ string analyze_text (const string S, const string MODE) {
 	if (BLD) oss << "<b>" << flush;
 	if (ITL) oss << "<i>" << flush;
 	if (IMG) oss << "<img src = " << T << flush;
-	if (HR1) oss << "<a style = " << T << " color:rgb(255, 255, 255); text-decoration: underline; " << T << "target = " << T << "_blank" << T << " href = " << T << flush;
+	//if (HR1) oss << "<a style = " << T << " color:rgb("<< COLOR << "); text-decoration: underline; " << T << "target = " << T << "_blank" << T << " href = " << T << flush;
 	if (HR2) oss << "" << flush;
-
-	const string OPEN = oss.str();
 
 	/*
 
-	<a style = " color:rgb(255, 255, 255);font-family: Verdana;font-size: 14;font-weight: bold;text-decoration: none; "target = "_self" href =
+	<a onclick="pageTracker._trackPageview ('
 
-	"pictures.htm"
+	/download/setup_sg2ps.exe
 
-	>
+	');" title="sg2ps setup - self extracting archive" href="
 
-	[  PICTURES  ]
+	download/setup_sg2ps.exe
 
-	</a> </td>
+	"><font color="#000000">
+
+	Windows installer
+
+	</a>
+
+
 	 */
 
-
+	string OPEN = oss.str();
 
 	stringstream css;
 	if (BLD) css << "</b>" << flush;
@@ -382,12 +425,6 @@ string analyze_text (const string S, const string MODE) {
 	if (HR1) css << T << ">" << flush;
 	if (HR2) css << "</a>" << flush;
 	const string CLOSE = css.str();
-
-	//cout << "MODE:  " << MODE << endl;
-	//cout << "OPEN:  " << OPEN << endl;
-	//cout << "CLOSE: " << CLOSE << endl;
-	//cout << "SEP:   " << SEP. << endl;
-	//cout << BLD << ITL << IMG << HR1 << HR2 << endl;
 
 	string OUT;
 
@@ -401,15 +438,43 @@ string analyze_text (const string S, const string MODE) {
 
 	for (size_t i = 0; i < row.size(); i++) {
 
+		string CLICK = "";
+
 		const bool FORMAT = (i < row.size() && !EVEN (i));
 
-		if (FORMAT) OUT = OUT + OPEN + row.at(i) + CLOSE;
+		bool INS_CLICK = false;
+
+		if (row.at(i).size() > 0) {
+
+			if (row.at(i).at(0) == '!') INS_CLICK = true;
+		}
+
+		if (HR1) {
+
+			stringstream hr1ss;
+			hr1ss << "<a style = " << T << " color:rgb("<< COLOR << "); text-decoration: underline; " << T << "target = " << T << "_blank" << T << flush;
+
+			if (INS_CLICK) {
+
+				row.at(i).erase (0, 1);
+
+				hr1ss
+				<< " onclick=" << T << "pageTracker._trackPageview ('"
+				<< row.at(i)
+				<< "');" << T << flush;
+			}
+			hr1ss << " href = " << T << flush;
+
+			OPEN = hr1ss.str();
+		}
+
+		if (FORMAT) OUT = OUT + OPEN + CLICK + row.at(i) + CLOSE;
 		else OUT = OUT + row.at(i);
 	}
 	return OUT;
 }
 
-void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH) {
+void dump_string (ofstream& o, const string TEXT, const string FONT, const string SIZE, const string ALIGN, const string LH, const string COLOR) {
 
 	text_open (o);
 	style_open (o);
@@ -418,6 +483,7 @@ void dump_string (ofstream& o, const string TEXT, const string FONT, const strin
 	style_font_family (o, FONT);
 	style_font_size (o, SIZE);
 	style_text_align (o, ALIGN);
+	style_text_color(o, COLOR);
 	style_line_height (o, LH);
 	style_close (o);
 	tag_end(o);
@@ -454,7 +520,7 @@ void list_string (ofstream& o, const string S, const string FONT, const string S
 	text_close(o);
 }
 
-void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH) {
+void write (ofstream& o, const string S, const string FONT, const string SIZE, const string ALIGN, const string LH, const string COLOR) {
 
 	if (S.size() == 0) {
 
@@ -477,12 +543,12 @@ void write (ofstream& o, const string S, const string FONT, const string SIZE, c
 
 	if (PROCESS_AS_LIST) TEXT.erase(0, 2);
 
-	TEXT = analyze_text (TEXT, "IMAGE");
-	TEXT = analyze_text (TEXT, "BOLD");
-	TEXT = analyze_text (TEXT, "ITALIC");
-	TEXT = analyze_text (TEXT, "HREF1");
-	TEXT = analyze_text (TEXT, "HREF2");
+	TEXT = analyze_text (TEXT, "IMAGE", COLOR);
+	TEXT = analyze_text (TEXT, "BOLD", COLOR);
+	TEXT = analyze_text (TEXT, "ITALIC", COLOR);
+	TEXT = analyze_text (TEXT, "HREF1", COLOR);
+	TEXT = analyze_text (TEXT, "HREF2", COLOR);
 
 	if (PROCESS_AS_LIST) list_string (o, TEXT, FONT, SIZE, ALIGN, LH);
-	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH);
+	else dump_string (o, TEXT, FONT, SIZE, ALIGN, LH, COLOR);
 }

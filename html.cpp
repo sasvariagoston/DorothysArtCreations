@@ -150,13 +150,14 @@ void generate_html_head (ofstream& o, const string MODE, const vector <ITEM>& IT
 
 	const bool E =  MODE == "ELEMENT";
 
-	const string T = return_HTML_HEAD_TITLE();
+	const string TT = return_HTML_HEAD_TITLE();
 
 	html_open (o);
 	head_open (o);
 
 	//title (o, T);
-	if (this_item < 999) title (o, T, IT.at(this_item).ITEM_NAME.at(0));
+	if (this_item < 999) title (o, TT, IT.at(this_item).ITEM_NAME.at(0));
+	else title (o, TT, "");
 	//if (this_item < 999) tags (o, IT, this_item);
 
 	string PATH = "";
@@ -232,7 +233,7 @@ void generate_header_and_links (ofstream& o, const string FN, const string MODE,
 	string PATH = "";
 	if (E) PATH = "../";
 
-	table_open (o, "center");
+	table_open (o, "0", "1", "center");
 	format_header_jpg (o);
 	cell_open (o);
 	tag_end(o);
@@ -247,7 +248,7 @@ void generate_header_and_links (ofstream& o, const string FN, const string MODE,
 	table_close(o);
 
 
-	table_open (o, "center");
+	table_open (o, "0", "1", "center");
 	format_header_table (o);
 
 	//const size_t HEADER_LINK_CHARS = return_header_links_chars (HEADER);
@@ -538,7 +539,7 @@ void generate_categories_element_table (ofstream& o, const string MODE, const st
 
 	for (size_t i = 0; i < ROWS; i++) {
 
-		table_open (o, "center");
+		table_open (o, "0", "1", "center");
 		const string CH = return_cell_height (MODE, ROWS);
 
 		categories_element_table_style (o, MODE, CH);
@@ -587,24 +588,66 @@ void list_properties_style (ofstream& o) {
 	tag_end(o);
 }
 
+void list_cost_style (ofstream& o) {
+
+	style_open (o);
+	style_margin_left (o, "20px");
+	style_line_height (o, return_COST_HEIGHT());
+	style_font_family (o, return_ELEMENT_properties_font_family ());
+	style_text_color (o, return_ELEMENT_properties_font_color ());
+	style_font_size (o, return_COST_properties_font_size ());
+	style_font_weight (o, return_ELEMENT_properties_font_weight ());
+	style_text_align (o, return_COST_properties_text_align());
+	style_close (o);
+	tag_end(o);
+}
+
+void list_price (ofstream& o, const string PROPERTY, const vector <string>& CONTENT) {
+
+	const bool SHP = PROPERTY == "SHIPPING";
+	const bool PRC = PROPERTY == "PRICE";
+
+	text_open (o);
+	list_cost_style(o);
+	o << PROPERTY << ": " << return_POUND () << CONTENT.at(0) << endl;
+	text_close (o);
+}
 
 void list_elements_vector (ofstream& o, const string PROPERTY, const vector <string>& CONTENT) {
 
-	text_open (o);
-	list_properties_style (o);
-	o << PROPERTY << endl;
-	text_close (o);
+	const bool LNK = PROPERTY == "LINK";
+	const bool PRC = PROPERTY == "PRICE";
+
+	if (! LNK) {
+
+		text_open (o);
+		list_properties_style (o);
+		o << PROPERTY << endl;
+		text_close (o);
+	}
 
 	for (size_t i = 0; i < CONTENT.size(); i++) {
 
 		const string FONT = return_ELEMENT_properties_element_font_family ();
-		const string SIZE = return_ELEMENT_properties_element_font_size ();
-		const string ALIGN = return_ELEMENT_properties_element_text_align ();
+
+		string SIZE = return_ELEMENT_properties_element_font_size ();
+		if (LNK) return_ELEMENT_properties_element_font_size_weblink ();
+
+		string ALIGN = return_ELEMENT_properties_element_text_align ();
+		if (LNK) ALIGN = return_ELEMENT_properties_element_text_align_weblink ();
+
 		const string LINEHEIGHT = return_ROW_HEIGHT();
 
-		write (o, "- " + CONTENT.at(i), FONT, SIZE, ALIGN, LINEHEIGHT);
+		const string C = return_ELEMENT_properties_title_font_color();
+
+		string TXT = CONTENT.at(i);
+
+		if (PRC) TXT = return_POUND () + TXT;
+
+		if (!LNK && !PRC) TXT = "- " + TXT;
+
+		write (o, TXT, FONT, SIZE, ALIGN, LINEHEIGHT, C);
 	}
-	//linebreak(o);
 }
 
 void element_properties_style (ofstream& o) {
@@ -635,7 +678,9 @@ void list_elements_bool (ofstream& o, const string ELEMENT, const bool STATUS) {
 	string S = "No";
 	if (STATUS) S = "Yes";
 
-	write (o, "- " + S, FONT, SIZE, ALIGN, LINEHEIGHT);
+	const string C = return_ELEMENT_properties_title_font_color();
+
+	write (o, "- " + S, FONT, SIZE, ALIGN, LINEHEIGHT, C);
 
 	//linebreak(o);
 }
@@ -653,22 +698,36 @@ void list_element_properties (ofstream& o, const ITEM& IT) {
 		linebreak(o);
 		list_elements_vector (o, "PROPERTIES", IT.PROPERTIES);
 	}
-	linebreak(o);
-	list_elements_bool (o, "AVAILABLE", IT.AVAILABLE);
+	//linebreak(o);
+	//list_elements_bool (o, "AVAILABLE", IT.AVAILABLE);
 
-	linebreak(o);
-	list_elements_bool (o, "ORDER", IT.ORDER);
+	//linebreak(o);
+	//list_elements_bool (o, "CAN I ORDER?", IT.ORDER);
 
 	if (IT.PRICE.size() > 0) {
 
 		linebreak(o);
-		list_elements_vector (o, "PRICE", IT.PRICE);
+		list_price (o, "PRICE", IT.PRICE);
 	}
 
 	if (IT.SHIPPING.size() > 0) {
 
+		//linebreak(o);
+		list_price (o, "SHIPPING", IT.SHIPPING);
+	}
+
+	//if (IT.LINK.size() > 0) {
+	//	linebreak(o);
+	//	list_elements_vector (o, "LINK", IT.LINK);
+	//}
+
+	if (IT.PAYPAL.size() > 0) {
+
 		linebreak(o);
-		list_elements_vector (o, "SHIPPING", IT.SHIPPING);
+		//style_open(o);
+		//style_text_align(o, "center");
+		//style_close(o);
+		list_paypal (o, IT.PAYPAL);
 	}
 }
 
@@ -783,9 +842,11 @@ void contact_details (ofstream& o) {
 
 	if (C.size() == 0) return;
 
+	const string CL = return_BLACK();
+
 	for (size_t i = 0; i < C.size(); i++) {
 
-		write (o, C.at(i), "Verdana", "14", "center", "150%");
+		write (o, C.at(i), "Verdana", "14", "center", "150%", CL);
 	}
 }
 
@@ -795,11 +856,13 @@ void feedbacks (ofstream& o) {
 
 	if (F.size() == 0) return;
 
-	write (o, "", "Verdana", "14", "left", "150%");
+	const string C = return_BLACK();
+
+	write (o, "", "Verdana", "14", "left", "150%", C);
 
 	for (size_t i = 0; i < F.size(); i++) {
 
-		write (o, F.at(i), "Verdana", "14", "justify", "150%");
+		write (o, F.at(i), "Verdana", "14", "justify", "150%", C);
 	}
 }
 
@@ -809,20 +872,14 @@ void events (ofstream& o) {
 
 	if (E.size() == 0) return;
 
-	write (o, "", "Verdana", "14", "left", "150%");
+	const string C = return_BLACK();
+
+	write (o, "", "Verdana", "14", "left", "150%", C);
 
 	for (size_t i = 0; i < E.size(); i++) {
 
-		write (o, E.at(i), "Verdana", "14", "justify", "150%");
+		write (o, E.at(i), "Verdana", "14", "justify", "150%", C);
 	}
-
-	//linebreak(o);
-	//image_open (o, "2015_11_wenue_cymru_1.jpg");
-	//tag_end(o);
-	//linebreak(o);
-	//linebreak(o);
-	//image_open (o, "2015_11_wenue_cymru_2.jpg");
-	//tag_end(o);
 }
 
 void about (ofstream& o) {
@@ -831,11 +888,13 @@ void about (ofstream& o) {
 
 	if (AB.size() == 0) return;
 
-	write (o, "", "Verdana", "14", "justify", "150%");
+	const string C = return_BLACK();
+
+	write (o, "", "Verdana", "14", "justify", "150%", C);
 
 	for (size_t i = 0; i < AB.size(); i++) {
 
-		write (o, AB.at(i), "Verdana", "14", "justify", "150%");
+		write (o, AB.at(i), "Verdana", "14", "justify", "150%", C);
 	}
 }
 
@@ -855,7 +914,7 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 
 	if (A ||I || C || P || E || CT || EV || FB) {
 
-		table_open (o, "center");
+		table_open (o, "0", "1", "center");
 		main_table_style (o, MODE);
 
 		if (A || CT || EV || FB) {
@@ -871,8 +930,6 @@ void generate_page_main_table (ofstream& o, const string FN, const string MODE, 
 		if (FB || EV) style_vertical_align(o, "top");
 
 		if (A || CT || EV || FB) style_width(o, "700px");
-
-		//style_line_height (o, return_ROW_HEIGHT());
 
 		style_close(o);
 		tag_end (o);
